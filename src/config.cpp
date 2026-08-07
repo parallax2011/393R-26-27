@@ -4,10 +4,10 @@
 pros::Controller cont(pros::E_CONTROLLER_MASTER);
 
 //motors
-pros::MotorGroup l({-1, 2, -3}, pros::MotorGears::blue);
-pros::MotorGroup r({4, -5, 6}, pros::MotorGears::blue);
+pros::MotorGroup l({-1, -2, -3}, pros::MotorGears::blue);
+pros::MotorGroup r({5, 9, 10}, pros::MotorGears::blue);
 pros::MotorGroup lift({-14, 15}, pros::MotorGears::red);
-pros::Motor intake(-12, pros::MotorGears::blue);
+pros::Motor intake(12, pros::MotorGears::blue);
 
 pros::adi::DigitalOut claw('A');
 
@@ -67,5 +67,3 @@ lemlib::Chassis chassis(dt, // drivetrain settings
                         angularCont, // angular PID settings
                         sensors // odometry sensors
 );
-
-//e

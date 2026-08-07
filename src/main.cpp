@@ -72,7 +72,8 @@ void controls() {
     //chassis
     int forward = cont.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
     int turn = cont.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-    chassis.curvature(forward, turn);
+
+    chassis.arcade(forward, turn, false);
 
     //intake
     if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
