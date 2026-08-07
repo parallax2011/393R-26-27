@@ -7,7 +7,7 @@ pros::Controller cont(pros::E_CONTROLLER_MASTER);
 pros::MotorGroup l({-1, -2, -3}, pros::MotorGears::blue);
 pros::MotorGroup r({5, 9, 10}, pros::MotorGears::blue);
 pros::MotorGroup lift({-14, 15}, pros::MotorGears::red);
-pros::Motor intake(6, pros::MotorGears::blue);
+pros::Motor intake(-6, pros::MotorGears::blue);
 
 pros::adi::DigitalOut claw('A');
 
