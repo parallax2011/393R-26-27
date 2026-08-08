@@ -9,7 +9,10 @@ pros::MotorGroup r({5, 9, 10}, pros::MotorGears::blue);
 pros::MotorGroup lift({-14, 15}, pros::MotorGears::red);
 pros::Motor intake(-6, pros::MotorGears::blue);
 
-pros::adi::DigitalOut claw('A');
+pros::adi::DigitalOut claw('G');
+
+pros::adi::DigitalOut test1('A');
+pros::adi::DigitalOut test2('B');
 
 // drivetrain settings
 lemlib::Drivetrain dt(&l, // left motor group

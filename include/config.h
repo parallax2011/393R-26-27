@@ -7,7 +7,8 @@ extern pros::MotorGroup r;
 extern pros::MotorGroup lift;
 extern pros::Motor intake;
 extern pros::adi::DigitalOut claw;
-
+extern pros::adi::DigitalOut test1;
+extern pros::adi::DigitalOut test2;
 extern lemlib::Drivetrain dt;
 
 extern pros::Imu imu;

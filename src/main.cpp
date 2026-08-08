@@ -67,6 +67,8 @@ void autonomous() {}
  */
 
 bool clawState = false;
+bool teststate1 = false;
+bool teststate2 = false;
 
 void controls() {
     //chassis
@@ -95,6 +97,16 @@ void controls() {
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
         clawState = !clawState;
         claw.set_value(clawState);
+    }
+
+    if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+        teststate1 = !teststate1;
+        test1.set_value(teststate1);
+    }
+
+    if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+        teststate2 = !teststate2;
+        test2.set_value(teststate2);
     }
 }
 
