@@ -66,9 +66,9 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 
-bool clawState = false;
-bool teststate1 = false;
-bool teststate2 = false;
+bool cState = false;
+bool rState = false;
+bool pState = false;
 
 void controls() {
     //chassis
@@ -82,32 +82,32 @@ void controls() {
     else if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) intake.move(-127);
     else intake.move(0);
     
-
     //lift
     if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
         lift.move(127);
     } else if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-        lift.move(-30);
+        lift.move(-70);
     } else {
         lift.move(0);
-        lift.set_brake_mode_all(pros::MotorBrake::brake);
+        lift.set_brake_mode_all(pros::MotorBrake::hold);
     }
 
     //claw
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-        clawState = !clawState;
-        claw.set_value(clawState);
+        cState = !cState;
+        claw.set_value(cState);
     }
-
+    //rotator
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-        teststate1 = !teststate1;
-        test1.set_value(teststate1);
+        rState = !rState;
+        rotator.set_value(rState);
+    }
+    //pivoter
+    if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
+        pState = !pState;
+        pivoter.set_value(pState);
     }
 
-    if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
-        teststate2 = !teststate2;
-        test2.set_value(teststate2);
-    }
 }
 
 void opcontrol() {

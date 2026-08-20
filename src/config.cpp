@@ -6,24 +6,24 @@ pros::Controller cont(pros::E_CONTROLLER_MASTER);
 //motors
 pros::MotorGroup l({-1, -2, -3}, pros::MotorGears::blue);
 pros::MotorGroup r({5, 9, 10}, pros::MotorGears::blue);
-pros::MotorGroup lift({-14, 15}, pros::MotorGears::red);
+pros::MotorGroup lift({-16, 17}, pros::MotorGears::red);
 pros::Motor intake(-6, pros::MotorGears::blue);
 
-pros::adi::DigitalOut claw('G');
-
-pros::adi::DigitalOut test1('A');
-pros::adi::DigitalOut test2('B');
+pros::adi::DigitalOut claw('F');
+pros::adi::DigitalOut pivoter('G');
+pros::adi::DigitalOut rotator('H');
 
 // drivetrain settings
 lemlib::Drivetrain dt(&l, // left motor group
                               &r, // right motor group
                               14.625, // 10 inch track width
                               lemlib::Omniwheel::NEW_275, // using new 4" omnis
-                              450, // drivetrain rpm is 360
+                              450, // drivetrain rpm is 450
                               2 // horizontal drift is 2 (for now)
 );
 
-pros::Imu imu(10); // imu
+pros::Imu imu(20); // imu
+pros::Rotation rot(19); // lift rotation sensor
 pros::Rotation horizEnc(20); // horizontal tracking wheel encoder
 pros::Rotation vertEnc(21); // vertical tracking wheel encoder
 
