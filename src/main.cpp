@@ -1,6 +1,8 @@
 #include "main.h"
 #include "config.h"
 #include "lemlib/api.hpp" // IWYU pragma: keep
+#include "pros/abstract_motor.hpp"
+#include "pros/misc.h"
 
 //using namespace pros;
 //using namespace lemlib;
@@ -10,16 +12,16 @@ void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
     // print position to brain screen
-    pros::Task screen_task([&]() {
-        while (true) {
-            // print robot location to the brain screen
-            pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
-            pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-            pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
-            // delay to save resources
-            pros::delay(20);
-        }
-    });
+    // pros::Task screen_task([&]() {
+    //     while (true) {
+    //         //print robot location to the brain screen
+    //         pros::lcd::print(0, "X: %f", chassis.getPose().x); // x
+    //         pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+    //         pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+    //         // // delay to save resources
+    //         pros::delay(20);
+    //     }
+    // });
 }
 /**
  * Runs while the robot is in the disabled state of Field Management System or
@@ -66,11 +68,38 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 
+void moveLift(float position) {
+    float rotation_pos = rot.get_position();
+
+    float error = position - std::abs(rotation_pos);
+    float prevError = 0;
+    int maxtime = 5000;
+    int timeout = 0;
+    while (std::abs(error) > 100 && timeout < maxtime) {
+        rotation_pos = rot.get_position();
+        float kp = 1;
+        float kd = 6;
+        float error = position - std::abs(rotation_pos);
+        float deriv = error - prevError;
+        float power = error*kp + deriv*kd;
+        lift.move(power);
+        timeout += 10;
+        cont.clear();
+        cont.print(1, 0, "Y: %f", error); // y
+
+        prevError = error;
+        pros::delay(10);
+    }
+    lift.set_brake_mode(pros::MotorBrake::hold);
+    lift.brake();
+}
+
 bool cState = false;
 bool rState = false;
 bool pState = false;
 
 void controls() {
+
     //chassis
     int forward = cont.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
     int turn = cont.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -108,11 +137,25 @@ void controls() {
         pivoter.set_value(pState);
     }
 
+    if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
+        moveLift(7000);
+    }
+
+    if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
+        chassis.turnToHeading(90, 4000);
+        }
+
 }
 
 void opcontrol() {
+   rot.set_position(0);
 	while (true) {
         controls();
+        float rotation_pos = rot.get_position();
+        pros::lcd::print(0, "X: %f", rotation_pos); // x
+        pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
+        pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+            // delay to save resources
         pros::delay(1);
 	}
 }
