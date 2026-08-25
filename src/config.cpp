@@ -1,6 +1,8 @@
 #include "lemlib/api.hpp" // IWYU pragma: keep
 #include "pros/adi.hpp"
 
+//using namespace pros;
+
 pros::Controller cont(pros::E_CONTROLLER_MASTER);
 
 //motors
@@ -14,12 +16,12 @@ pros::adi::DigitalOut pivoter('G');
 //pros::adi::DigitalOut rotator('H');
 
 // drivetrain settings
-lemlib::Drivetrain dt(&l, // left motor group
-                              &r, // right motor group
-                              14.625, // 10 inch track width
-                              lemlib::Omniwheel::NEW_275, // using new 4" omnis
-                              450, // drivetrain rpm is 450
-                              2 // horizontal drift is 2 (for now)
+lemlib::Drivetrain dt(&l,
+                              &r,
+                              14.625,
+                              lemlib::Omniwheel::NEW_275,
+                              450,
+                              2 // (for now)
 );
 
 pros::Imu imu(11); // imu
