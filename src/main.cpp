@@ -11,6 +11,8 @@
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
+    claw.set_value(true);
+    rotator.set_value(false);
     // print position to brain screen
     // pros::Task screen_task([&]() {
     //     while (true) {
@@ -94,12 +96,11 @@ void moveLift(float position) {
     lift.brake();
 }
 
-bool cState = false;
+bool cState = true;
 bool rState = false;
 bool pState = false;
 
 void controls() {
-
     //chassis
     int forward = cont.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
     int turn = cont.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
@@ -143,19 +144,25 @@ void controls() {
 
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
         chassis.turnToHeading(90, 4000);
-        }
+    }
+
+    if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
+        chassis.moveToPoint(0, 30, 4000);
+    }
 
 }
 
 void opcontrol() {
-   rot.set_position(0);
+    rot.set_position(0);
 	while (true) {
         controls();
         float rotation_pos = rot.get_position();
-        pros::lcd::print(0, "X: %f", rotation_pos); // x
-        pros::lcd::print(1, "Y: %f", chassis.getPose().y); // y
-        pros::lcd::print(2, "Theta: %f", chassis.getPose().theta); // heading
+ 
+        cont.print(0, 0, "X: %f", chassis.getPose().x);
+        cont.print(1, 0, "Y: %f", chassis.getPose().y);
+        cont.print(2, 0, "Angle: %f", chassis.getPose().theta);
+        cont.clear();
             // delay to save resources
-        pros::delay(1);
+        //pros::delay(1);
 	}
 }

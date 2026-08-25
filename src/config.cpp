@@ -24,13 +24,13 @@ lemlib::Drivetrain dt(&l, // left motor group
 
 pros::Imu imu(11); // imu
 pros::Rotation rot(19); // lift rotation sensor
-pros::Rotation horizEnc(20); // horizontal tracking wheel encoder
-pros::Rotation vertEnc(21); // vertical tracking wheel encoder
+pros::Rotation horizEnc(12); // horizontal tracking wheel encoder
+pros::Rotation vertEnc(-4); // vertical tracking wheel encoder
 
 // horizontal tracking wheel
-lemlib::TrackingWheel horizTrackWheel(&horizEnc, lemlib::Omniwheel::NEW_275, -5.75);
+lemlib::TrackingWheel horizTrackWheel(&horizEnc, lemlib::Omniwheel::NEW_275, -1.75);
 // vertical tracking wheel
-lemlib::TrackingWheel vertTrackWheel(&vertEnc, lemlib::Omniwheel::NEW_275, -2.5);
+lemlib::TrackingWheel vertTrackWheel(&vertEnc, lemlib::Omniwheel::NEW_275, 1);
 
 // odometry settings
 lemlib::OdomSensors sensors(&vertTrackWheel, // vertical tracking wheel 1, set to null
@@ -41,9 +41,9 @@ lemlib::OdomSensors sensors(&vertTrackWheel, // vertical tracking wheel 1, set t
 );
 
 // lateral PID controller
-lemlib::ControllerSettings lateralCont(10, // proportional gain (kP)
+lemlib::ControllerSettings lateralCont(7, // proportional gain (kP)
                                               0, // integral gain (kI)
-                                              3, // derivative gain (kD)
+                                              32, // derivative gain (kD)
                                               3, // anti windup
                                               1, // small error range, in inches
                                               100, // small error range timeout, in milliseconds
@@ -53,9 +53,9 @@ lemlib::ControllerSettings lateralCont(10, // proportional gain (kP)
 );
 
 // angular PID controller
-lemlib::ControllerSettings angularCont(6.5, // proportional gain (kP)
-                                              0.0001, // integral gain (kI)
-                                              32, // derivative gain (kD)
+lemlib::ControllerSettings angularCont(6, // proportional gain (kP)
+                                              0.000, // integral gain (kI)
+                                              48, // derivative gain (kD)
                                               3, // anti windup
                                               1, // small error range, in inches
                                               100, // small error range timeout, in milliseconds
