@@ -11,7 +11,7 @@ pros::Motor intake(-6, pros::MotorGears::blue);
 
 pros::adi::DigitalOut claw('F');
 pros::adi::DigitalOut pivoter('G');
-pros::adi::DigitalOut rotator('H');
+//pros::adi::DigitalOut rotator('H');
 
 // drivetrain settings
 lemlib::Drivetrain dt(&l, // left motor group

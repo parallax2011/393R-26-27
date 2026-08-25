@@ -70,34 +70,30 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 
-void moveLift(float position) {
-    float rotation_pos = rot.get_position();
-
-    float error = position - std::abs(rotation_pos);
+void moveLift(float target) {
+    lift.set_brake_mode(pros::MotorBrake::hold);
+    float pos = rot.get_position();
+    float error = target - std::abs(pos);
+    float deriv = 0;
     float prevError = 0;
-    int maxtime = 5000;
-    int timeout = 0;
-    while (std::abs(error) > 100 && timeout < maxtime) {
-        rotation_pos = rot.get_position();
-        float kp = 1;
-        float kd = 6;
-        float error = position - std::abs(rotation_pos);
-        float deriv = error - prevError;
-        float power = error*kp + deriv*kd;
+    int timeRunning = 0; int timeout = 5000;
+    float kp = 1; float kd = 6;
+    while (std::abs(error) > 100 and timeRunning < timeout) {
+        pos = rot.get_position();
+        error = target - std::abs(pos);
+        deriv = error - prevError;
+        float power = kp * error + kd * deriv;
         lift.move(power);
-        timeout += 10;
-        cont.clear();
-        cont.print(1, 0, "Y: %f", error); // y
-
+        //cont.clear();
+        //cont.print(1, 0, "Y: %f", error); // y
+        timeRunning += 10;
         prevError = error;
         pros::delay(10);
     }
-    lift.set_brake_mode(pros::MotorBrake::hold);
     lift.brake();
 }
 
 bool cState = true;
-bool rState = false;
 bool pState = false;
 
 void controls() {
@@ -127,11 +123,11 @@ void controls() {
         cState = !cState;
         claw.set_value(cState);
     }
-    //rotator
-    if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-        rState = !rState;
-        rotator.set_value(rState);
-    }
+    // rotator
+    // if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
+    //     rState = !rState;
+    //     rotator.set_value(rState);
+    // }
     //pivoter
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
         pState = !pState;
