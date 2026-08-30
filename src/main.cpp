@@ -70,6 +70,8 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 
+
+
 void moveLift(float target) {
     lift.set_brake_mode(pros::MotorBrake::hold);
     float pos = rot.get_position();
@@ -123,33 +125,40 @@ void controls() {
         cState = !cState;
         claw.set_value(cState);
     }
+
     // rotator
     // if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
     //     rState = !rState;
     //     rotator.set_value(rState);
     // }
+
     //pivoter
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
         pState = !pState;
         pivoter.set_value(pState);
     }
 
+    // pid tuning buttons
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
         moveLift(7000);
     }
-
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
         chassis.turnToHeading(90, 4000);
     }
-
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
         chassis.moveToPoint(0, 30, 4000);
     }
 
+    //distance sensor - claw code
+    if (dist.get_distance() < 50) {
+        claw.set_value(true);
+        cState = true; //for toggling properly
+    }
 }
 
 void opcontrol() {
     rot.set_position(0);
+    //pros::Distance distanceSensor(2);
 	while (true) {
         controls();
         float rotation_pos = rot.get_position();

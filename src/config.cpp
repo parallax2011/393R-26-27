@@ -1,7 +1,6 @@
 #include "lemlib/api.hpp" // IWYU pragma: keep
 #include "pros/adi.hpp"
-
-//using namespace pros;
+#include "pros/distance.hpp"
 
 pros::Controller cont(pros::E_CONTROLLER_MASTER);
 
@@ -24,6 +23,7 @@ lemlib::Drivetrain dt(&l,
                               2 // (for now)
 );
 
+pros::Distance dist(12);
 pros::Imu imu(11); // imu
 pros::Rotation rot(19); // lift rotation sensor
 pros::Rotation horizEnc(12); // horizontal tracking wheel encoder
