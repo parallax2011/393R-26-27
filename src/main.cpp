@@ -54,23 +54,6 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
-
-/**
- * Runs the operator control code. This function will be started in its own task
- * with the default priority and stack size whenever the robot is enabled via
- * the Field Management System or the VEX Competition Switch in the operator
- * control mode.
- *
- * If no competition control is connected, this function will run immediately
- * following initialize().
- *
- * If the robot is disabled or communications is lost, the
- * operator control task will be stopped. Re-enabling the robot will restart the
- * task, not resume it from where it left off.
- */
-
-
 
 void moveLift(float target) {
     lift.set_brake_mode(pros::MotorBrake::hold);
@@ -95,26 +78,62 @@ void moveLift(float target) {
     lift.brake();
 }
 
+void telemetry() {
+    cont.print(0, 0, "X: %f", chassis.getPose().x);
+    cont.print(1, 0, "Y: %f", chassis.getPose().y);
+    cont.print(2, 0, "Theta: %f", chassis.getPose().theta);
+}
+
+void test() {
+    chassis.setPose(0, 0, 0);
+    chassis.moveToPoint(0, -8, 4000, {.forwards = false} );
+    chassis.swingToHeading(90, lemlib::DriveSide::LEFT, 3000, 
+                           {.direction = lemlib::AngularDirection::CW_CLOCKWISE});
+    // chassis.setPose(0, 0, 90);
+    // cont.print(0, 0, "X: %f", chassis.);
+    // cont.print(1, 0, "Y: %f", chassis.getPose().y);
+    // cont.print(2, 0, "Theta: %f", chassis.getPose().theta);
+    chassis.moveToPoint(-10, -12, 4000, {.forwards = false});
+
+    // lemlib::Pose pose = chassis.getPose();
+    // // pros::lcd::print(0, "X: %f", pose.x);
+    // // pros::lcd::print(1, "Y: %f", pose.y);
+    // // pros::lcd::print(2, "Theta: %f", pose.theta);
+
+
+    // chassis.swingToHeading(60, lemlib::DriveSide::LEFT, 3000, 
+    //                        {.direction = lemlib::AngularDirection::CW_CLOCKWISE} );
+    // moveLift(2000);
+    // chassis.moveToPoint(-4, -2.5, 3000, {.forwards = false, .maxSpeed = 50});
+}
+
+void autonomous() {
+
+    int auton = 0;
+
+    if (auton == 0) { test(); }
+}
+
+/**
+ * Runs the operator control code. This function will be started in its own task
+ * with the default priority and stack size whenever the robot is enabled via
+ * the Field Management System or the VEX Competition Switch in the operator
+ * control mode.
+ *
+ * If no competition control is connected, this function will run immediately
+ * following initialize().
+ *
+ * If the robot is disabled or communications is lost, the
+ * operator control task will be stopped. Re-enabling the robot will restart the
+ * task, not resume it from where it left off.
+ */
+
+
+
 bool cState = false;
 bool pState = false;
-
 bool detect = true;
 
-    // if (detect && dist.get() < 50) {
-    //     claw.set_value(0);
-    // // }
-    // if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
-    //     cState = !cState;
-    //     claw.set_value(cState);
-    //     if (cState) {
-    //         // detect = false;
-    //     } else if (!cState) {
-    //         // detect = false;
-    //         if (dist.get() < 50) {
-    //             claw.set_value(0);
-    //         }
-    //     }
-    // }
 
 void controls() {
     //chassis
@@ -178,17 +197,18 @@ void controls() {
 
 void opcontrol() {
     rot.set_position(0);
+    chassis.setPose(0, 0, 0);
 
 	while (true) {
         controls();
         float rotation_pos = rot.get_position();
- 
+         
         cont.print(0, 0, "X: %f", chassis.getPose().x);
         cont.print(1, 0, "Y: %f", chassis.getPose().y);
         cont.print(2, 0, "T: %f", chassis.getPose().theta);
 
         cont.clear();
             // delay to save resources
-        pros::delay(1);
+        // pros::delay(1);
 	}
 }

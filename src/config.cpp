@@ -10,7 +10,7 @@ pros::MotorGroup r({5, 9, 10}, pros::MotorGears::blue);
 pros::MotorGroup lift({-16, 17}, pros::MotorGears::red);
 pros::Motor intake(-6, pros::MotorGears::blue);
 
-pros::adi::DigitalOut claw('F');
+pros::adi::DigitalOut claw('F', LOW);
 pros::adi::DigitalOut pivoter('G');
 //pros::adi::DigitalOut rotator('H');
 
