@@ -3,6 +3,7 @@
 #include "lemlib/api.hpp" // IWYU pragma: keep
 #include "pros/abstract_motor.hpp"
 #include "pros/misc.h"
+#include <cstdint>
 
 //using namespace pros;
 //using namespace lemlib;
@@ -133,7 +134,7 @@ void autonomous() {
 bool cState = false;
 bool pState = false;
 bool detect = true;
-
+int distToClamp = 80.0;
 
 void controls() {
     //chassis
@@ -167,10 +168,10 @@ void controls() {
         }
     }
     //detection window is open and claw is open
-    if (!detect and cState and dist.get() > 50) {
+    if (!detect and cState and dist.get() > distToClamp) {
         detect = true;
     }
-    if (detect and dist.get() < 50) {
+    if (detect and dist.get() < distToClamp) {
         claw.set_value(false); //close claw once object < 50mm
         detect = false;
         cState = false;
