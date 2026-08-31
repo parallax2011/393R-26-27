@@ -23,7 +23,7 @@ lemlib::Drivetrain dt(&l,
                               2 // (for now)
 );
 
-pros::Distance dist(12);
+pros::Distance dist(21);
 pros::Imu imu(11); // imu
 pros::Rotation rot(19); // lift rotation sensor
 pros::Rotation horizEnc(12); // horizontal tracking wheel encoder

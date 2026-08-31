@@ -12,7 +12,7 @@ void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
     claw.set_value(true);
-    rotator.set_value(false);
+    //rotator.set_value(false);
     // print position to brain screen
     // pros::Task screen_task([&]() {
     //     while (true) {
@@ -95,14 +95,31 @@ void moveLift(float target) {
     lift.brake();
 }
 
-bool cState = true;
+bool cState = false;
 bool pState = false;
+
+bool detect = true;
+
+    // if (detect && dist.get() < 50) {
+    //     claw.set_value(0);
+    // // }
+    // if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
+    //     cState = !cState;
+    //     claw.set_value(cState);
+    //     if (cState) {
+    //         // detect = false;
+    //     } else if (!cState) {
+    //         // detect = false;
+    //         if (dist.get() < 50) {
+    //             claw.set_value(0);
+    //         }
+    //     }
+    // }
 
 void controls() {
     //chassis
     int forward = cont.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
     int turn = cont.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X);
-
     chassis.arcade(forward, turn, false);
 
     //intake
@@ -114,7 +131,7 @@ void controls() {
     if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
         lift.move(127);
     } else if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-        lift.move(-70);
+        lift.move(-85);
     } else {
         lift.move(0);
         lift.set_brake_mode_all(pros::MotorBrake::hold);
@@ -124,13 +141,21 @@ void controls() {
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
         cState = !cState;
         claw.set_value(cState);
+        if (cState) { //if opened claw
+            detect = false;
+        } else if (!cState) { //if closed claw
+            detect = false;
+        }
     }
-
-    // rotator
-    // if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_X)) {
-    //     rState = !rState;
-    //     rotator.set_value(rState);
-    // }
+    //detection window is open and claw is open
+    if (!detect and cState and dist.get() > 50) {
+        detect = true;
+    }
+    if (detect and dist.get() < 50) {
+        claw.set_value(false); //close claw once object < 50mm
+        detect = false;
+        cState = false;
+    }
 
     //pivoter
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
@@ -140,7 +165,8 @@ void controls() {
 
     // pid tuning buttons
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
-        moveLift(7000);
+        // moveLift(7000);
+        claw.set_value(1);
     }
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
         chassis.turnToHeading(90, 4000);
@@ -148,26 +174,21 @@ void controls() {
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
         chassis.moveToPoint(0, 30, 4000);
     }
-
-    //distance sensor - claw code
-    if (dist.get_distance() < 50) {
-        claw.set_value(true);
-        cState = true; //for toggling properly
-    }
 }
 
 void opcontrol() {
     rot.set_position(0);
-    //pros::Distance distanceSensor(2);
+
 	while (true) {
         controls();
         float rotation_pos = rot.get_position();
  
         cont.print(0, 0, "X: %f", chassis.getPose().x);
         cont.print(1, 0, "Y: %f", chassis.getPose().y);
-        cont.print(2, 0, "Angle: %f", chassis.getPose().theta);
+        cont.print(2, 0, "T: %f", chassis.getPose().theta);
+
         cont.clear();
             // delay to save resources
-        //pros::delay(1);
+        pros::delay(1);
 	}
 }
