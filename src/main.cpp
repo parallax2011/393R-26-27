@@ -12,7 +12,11 @@
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
-    claw.set_value(true);
+    claw.set_value(false);
+    pivoter.set_value(true);
+
+    // chassis.setPose(-70, 0, 270);
+
     //rotator.set_value(false);
     // print position to brain screen
     // pros::Task screen_task([&]() {
@@ -108,11 +112,27 @@ void test() {
     // chassis.moveToPoint(-4, -2.5, 3000, {.forwards = false, .maxSpeed = 50});
 }
 
+void skills_auton() {
+    claw.set_value(false);
+    chassis.setPose(-70, 0, 270);
+    chassis.moveToPoint(-64, 0, 1000, {.forwards = false, .maxSpeed = 100, .minSpeed = 100});
+    chassis.moveToPoint(-69, 0, 1000, {.maxSpeed = 100, .minSpeed = 100});
+    chassis.moveToPoint(-64, 0, 1000, {.forwards = false, .maxSpeed = 100, .minSpeed = 100});
+    chassis.moveToPoint(-69, 0, 1000, {.maxSpeed = 100, .minSpeed = 100});
+
+    chassis.moveToPoint(-50, 0, 3000, {.forwards = false, .maxSpeed = 100}, false);
+    chassis.turnToHeading(0, 1500, {}, false);
+    moveLift(-700);
+    pivoter.set_value(false);
+    pros::delay(999999);
+}
+
 void autonomous() {
 
-    int auton = 0;
+    int auton = 1;
 
-    if (auton == 0) { test(); }
+    if(auton == 0) test();
+    if(auton == 1) skills_auton();
 }
 
 /**
@@ -194,6 +214,10 @@ void controls() {
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
         chassis.moveToPoint(0, 30, 4000);
     }
+
+    if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
+        skills_auton();
+    }
 }
 
 void opcontrol() {
@@ -206,7 +230,7 @@ void opcontrol() {
          
         cont.print(0, 0, "X: %f", chassis.getPose().x);
         cont.print(1, 0, "Y: %f", chassis.getPose().y);
-        cont.print(2, 0, "T: %f", chassis.getPose().theta);
+        cont.print(2, 0, "T: %f", rotation_pos);
 
         cont.clear();
             // delay to save resources

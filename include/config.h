@@ -15,6 +15,8 @@ extern pros::adi::DigitalOut pivoter;
 extern lemlib::Drivetrain dt;
 
 extern pros::Distance dist;
+extern pros::Distance backdist;
+
 extern pros::Imu imu;
 extern pros::Rotation rot;
 extern pros::Rotation horizEnc;
