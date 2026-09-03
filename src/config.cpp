@@ -26,14 +26,14 @@ lemlib::Drivetrain dt(&l,
 pros::Distance dist(21);
 pros::Distance backdist(13);
 pros::Imu imu(11); // imu
-pros::Rotation rot(19); // lift rotation sensor
+pros::Rotation rot(18); // lift rotation sensor
 pros::Rotation horizEnc(12); // horizontal tracking wheel encoder
-pros::Rotation vertEnc(-4); // vertical tracking wheel encoder
+pros::Rotation vertEnc(-7); // vertical tracking wheel encoder
 
 // horizontal tracking wheel
-lemlib::TrackingWheel horizTrackWheel(&horizEnc, lemlib::Omniwheel::NEW_275, -1.75);
+lemlib::TrackingWheel horizTrackWheel(&horizEnc, lemlib::Omniwheel::NEW_2, -1.75);
 // vertical tracking wheel
-lemlib::TrackingWheel vertTrackWheel(&vertEnc, lemlib::Omniwheel::NEW_275, 1);
+lemlib::TrackingWheel vertTrackWheel(&vertEnc, lemlib::Omniwheel::NEW_2, 1.1);
 
 // odometry settings
 lemlib::OdomSensors sensors(&vertTrackWheel, // vertical tracking wheel 1, set to null
