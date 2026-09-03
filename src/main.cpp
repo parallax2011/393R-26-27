@@ -3,6 +3,8 @@
 #include "lemlib/api.hpp" // IWYU pragma: keep
 #include "pros/abstract_motor.hpp"
 #include "pros/misc.h"
+#include "distance.h"
+#include "pid.h"
 #include <cstdint>
 
 //using namespace pros;
@@ -12,7 +14,11 @@
 void initialize() {
     pros::lcd::initialize(); // initialize brain screen
     chassis.calibrate(); // calibrate sensors
-    claw.set_value(true);
+    claw.set_value(false);
+    pivoter.set_value(false);
+
+    // chassis.setPose(-70, 0, 270);
+
     //rotator.set_value(false);
     // print position to brain screen
     // pros::Task screen_task([&]() {
@@ -108,11 +114,129 @@ void test() {
     // chassis.moveToPoint(-4, -2.5, 3000, {.forwards = false, .maxSpeed = 50});
 }
 
+
+
+void up_lift_motion() {
+
+}
+
+void skills_auton() {
+    bool lift_finished = false;
+    claw.set_value(false);
+    chassis.setPose(-70, 0, 270);
+    lift.move(-20);
+
+    //Spin toggle:
+    chassis.moveToPoint(-65, 0, 1000, {.forwards = false, .maxSpeed = 100, .minSpeed = 100});
+    chassis.moveToPoint(-68.5, 0, 1000, {.maxSpeed = 100, .minSpeed = 100});
+    chassis.moveToPoint(-65.5, 0, 1000, {.forwards = false, .maxSpeed = 100, .minSpeed = 100});
+    chassis.moveToPoint(-68.5, 0, 1000, {.maxSpeed = 100, .minSpeed = 100});
+
+    //Turn towards first goal
+    lift.move(0);
+    chassis.moveToPoint(-55, 0, 3000, {.forwards = false, .maxSpeed = 100}, false);
+    chassis.turnToHeading(0, 1500, {}, false);
+    chassis.setPose(-55, 0, 0);
+
+    //Task to move lift
+    pros::Task lift1([&] {
+        moveLift(800);
+        lift_finished = true;
+    });
+
+    //Move to goal to score
+    chassis.moveToPoint(-55, -8.5, 3000, {.forwards = false, .maxSpeed = 90, .minSpeed = 90, .earlyExitRange = 3}, false);
+    // distanceDriveBack(20, 1000);
+    chasMove(-32, -32);
+    while(lift_finished == false) {}
+
+    //Score
+    lift.move(-63);
+    pros::delay(500);
+    lift.move(0);
+    claw.set_value(true);
+    pros::delay(300);
+
+    //Get second cone & pin
+    chassis.moveToPoint(-56, 4, 3000, {.maxSpeed = 90}, false);
+    //chassis.turnToHeading(-47, 1500, {}, false);
+    chassis.turnToPoint(-27, -20, 3000, {.forwards = false}, false);
+
+    chassis.setPose(-56, 4, chassis.getPose().theta);
+    chassis.moveToPoint(-27, -20, 3000, {.forwards = false, .maxSpeed = 90});
+    while(chassis.isInMotion()) {
+        if(dist.get() < 140) {
+            claw.set_value(false);
+        }
+    }
+
+    if(dist.get() < 140) {
+        claw.set_value(false);
+    }
+
+    chassis.turnToHeading(89, 1500, {}, false);
+    chassis.setPose(-26, -20, 89);
+    // chassis.setPose(-33, -16, 90);
+   
+
+    lift_finished = false;
+    //Task to move lift
+    pros::Task lift2([&] {
+        moveLift(2300);
+        lift_finished = true;
+    });
+
+    chassis.moveToPoint(-38, -21, 3000, {.forwards = false, .maxSpeed = 100, .minSpeed = 100, .earlyExitRange = 3}, false);
+    distanceDriveBack(40, 800);
+    chasMove(-63, -63);
+
+    while(lift_finished == false) {}
+    
+    // lift.move(-63);
+    // pros::delay(500);
+    // lift.move(0);
+
+
+    moveLift(1000);
+    claw.set_value(true);
+    chasMove(0, 0);
+    pros::delay(200);
+    chassis.moveToPoint(-34, -20, 3000, {.maxSpeed = 90}, false);
+    lift.move(-127);
+    //chassis.turnToHeading(47, 1500, {}, false);
+    chassis.turnToPoint(-50.5, -44, 3000, {.forwards = false}, false);
+    chassis.setPose(-34, -20, chassis.getPose().theta);
+    lift.move(0);
+
+    chassis.moveToPoint(-50.5, -44, 3000, {.forwards = false, .maxSpeed = 90});
+
+    while(chassis.isInMotion()) {
+        if(dist.get() < 130) {
+            claw.set_value(false);
+        }
+    }
+    pros::Task lift3([&] {
+        moveLift(2300);
+        lift_finished = true;
+    });
+
+    if(dist.get() < 130) {
+        claw.set_value(false);
+    }
+
+    // chassis.moveToPoint(-52, -45, 3000, {.forwards = false, .maxSpeed = 90}, false);
+
+    chassis.turnToHeading(178, 1500, {}, false);
+    chassis.setPose(-54, -47, 0);
+    pros::delay(999999);
+}
+
 void autonomous() {
 
-    int auton = 0;
+    int auton = 1;
 
-    if (auton == 0) { test(); }
+    if(auton == 0) test();
+    if(auton == 1) skills_auton();
 }
 
 /**
@@ -194,6 +318,17 @@ void controls() {
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_LEFT)) {
         chassis.moveToPoint(0, 30, 4000);
     }
+
+    if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_X)) {
+        skills_auton();
+    }
+
+    if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_DOWN)) {
+        moveLift(2300);
+        moveLift(2000);
+        claw.set_value(true);
+        pros::delay(1000);
+    }
 }
 
 void opcontrol() {
@@ -206,7 +341,7 @@ void opcontrol() {
          
         cont.print(0, 0, "X: %f", chassis.getPose().x);
         cont.print(1, 0, "Y: %f", chassis.getPose().y);
-        cont.print(2, 0, "T: %f", chassis.getPose().theta);
+        cont.print(2, 0, "T: %f", rotation_pos);
 
         cont.clear();
             // delay to save resources
