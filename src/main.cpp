@@ -146,7 +146,7 @@ void controls() {
     if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.move(127);
     else if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) intake.move(-127);
     else intake.move(0);
-    
+    7
     //lift
     if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
         lift.move(127);
