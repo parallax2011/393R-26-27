@@ -231,12 +231,25 @@ void skills_auton() {
     pros::delay(999999);
 }
 
+void auto1() {
+
+    // preload -> specific goal
+    chassis.setPose(0, 0, 0);
+    lift.move(-127);
+    chassis.moveToPoint(0, 3, 3000);
+    lift.move(127);
+    pros::delay(500);
+    lift.move(-127);
+
+    // get next pin/cup
+    claw.set_value(false);
+}
+
 void autonomous() {
-
-    int auton = 1;
-
+    int auton = 2;
     if(auton == 0) test();
     if(auton == 1) skills_auton();
+    if(auton == 2) auto1();
 }
 
 /**
@@ -258,7 +271,9 @@ void autonomous() {
 bool cState = false;
 bool pState = false;
 bool detect = true;
-int distToClamp = 80.0;
+int distToClamp = 60.0;
+uint32_t initTime = 0;
+int delayTime = 2000;
 
 void controls() {
     //chassis
@@ -270,12 +285,12 @@ void controls() {
     if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) intake.move(127);
     else if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_R2)) intake.move(-127);
     else intake.move(0);
-    7
+    
     //lift
     if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
         lift.move(127);
     } else if (cont.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-        lift.move(-85);
+        lift.move(-127);
     } else {
         lift.move(0);
         lift.set_brake_mode_all(pros::MotorBrake::hold);
@@ -285,32 +300,41 @@ void controls() {
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_A)) {
         cState = !cState;
         claw.set_value(cState);
-        if (cState) { //if opened claw
-            detect = false;
-        } else if (!cState) { //if closed claw
-            detect = false;
+        // if (cState) { //if opened claw
+        //     detect = false;
+        // } else if (!cState) { //if closed claw
+        //     detect = false;
+        // }
+        detect = false; //false regardless cuz it doesn't matter anymore
+        if (cState) {
+            initTime = pros::millis();
         }
     }
     //detection window is open and claw is open
-    if (!detect and cState and dist.get() > distToClamp) {
+    // if (!detect and !pState and cState and dist.get() > distToClamp) {
+    if (!detect and !pState and cState and pros::millis() - initTime >= delayTime) {
         detect = true;
     }
     if (detect and dist.get() < distToClamp) {
-        claw.set_value(false); //close claw once object < 50mm
         detect = false;
         cState = false;
+        claw.set_value(false); //close claw once object < 60mm
     }
-
     //pivoter
     if (cont.get_digital_new_press(pros::E_CONTROLLER_DIGITAL_Y)) {
         pState = !pState;
+        if (pState) {
+            detect = false;
+        } else if (!pState) {
+            detect = true;
+        }
         pivoter.set_value(pState);
     }
 
     // pid tuning buttons
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_B)) {
         // moveLift(7000);
-        claw.set_value(1);
+        pivoter.set_value(1);
     }
     if(cont.get_digital(pros::E_CONTROLLER_DIGITAL_UP)) {
         chassis.turnToHeading(90, 4000);

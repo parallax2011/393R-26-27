@@ -1,6 +1,6 @@
 #include "config.h"
-#include "pros/adi.hpp"
-#include "pros/motors.h"
+// #include "pros/adi.hpp"
+// #include "pros/motors.h"
 #include "pid.h"
 #include "distance.h"
 
@@ -8,8 +8,6 @@ using namespace pros;
 using namespace std; 
 
 float distanceconfigure = 0;
-
-
 
 void distanceDriveBack(int target, int timein) {
 
